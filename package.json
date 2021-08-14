@@ -1,0 +1,31 @@
+{
+  "name": "world-planner-api",
+  "version": "1.0.0",
+  "description": "World planner Web API for the world planner.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrAugu/world-planner-api.git"
+  },
+  "author": "MrAugu#7917",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrAugu/world-planner-api/issues"
+  },
+  "homepage": "https://github.com/MrAugu/world-planner-api#readme",
+  "dependencies": {
+    "@modcord/collection": "^1.0.2",
+    "dotenv": "^10.0.0",
+    "fastify": "^3.20.2",
+    "fastify-autoload": "^3.8.0",
+    "fastify-cors": "^6.0.2",
+    "fastify-helmet": "^5.3.2",
+    "fastify-rate-limit": "^5.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "mysql2": "^2.3.0"
+  }
+}
