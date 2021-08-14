@@ -21,7 +21,10 @@ const routes = async (fastify) => {
         action_type: item.action_type,
         texture_x: item.texture_x,
         texture_y: item.texture_y,
-        collision_type: item.collision_type
+        collision_type: item.collision_type,
+        rarity: item.rarity,
+        max_amount: item.max_amount,
+        break_hits: item.break_hits
       }))
     }); 
   });

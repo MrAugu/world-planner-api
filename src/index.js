@@ -7,8 +7,8 @@ require("dotenv").config();
 
 (async function () {
   fastify.addHook("onSend", async (request, response) => {
-    response.header("Access-Control-Allow-Credentials", true);
-    response.header("X-Made-By", "MrAugu <mraugu@yahoo.com> / MrAugu#7917");
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("X-Powered-By", "MrAugu <mraugu@yahoo.com> / MrAugu#7917");
   });
   
   await fastify.register(AutoLoad, {
@@ -26,6 +26,15 @@ require("dotenv").config();
   }, async (request, response) => {
     response.code(404).send({ "you are": "idiot" });
   }); // eslint-disable-line
+
+  process.on("uncaughtException", console.error);
+  process.on("unhandledRejection", console.error);
+
+  for (const texture of Array.from(fastify.cache.textures.values())) {
+    process.stdout.write(`[Cache]: Slicing ${texture.hash} (${(texture.width / 32) * (texture.height / 32)} blocks)..`);
+    await texture.createSlices();
+    process.stdout.write(" OK\n");
+  }
 
   fastify.listen(parseInt(process.env.PORT), "0.0.0.0", (error, address) => {
     if (error) throw error;
