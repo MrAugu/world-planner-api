@@ -9,7 +9,7 @@ const routes = async (fastify) => {
     response.code(200).send(texture.contents);
   });
 
-  fastify.get("/media/textures/slice/:hash", async (request, response) => {
+  fastify.get("/media/textures/:hash/sprites", async (request, response) => {
     const texture = fastify.cache.textures.get(request.params.hash);
     if (!texture) return response.code(404).send(codes[404]);
     
@@ -35,7 +35,7 @@ const routes = async (fastify) => {
     }
   });
 
-  fastify.get("/media/textures/slice/:hash/bulk", async (request, response) => {
+  fastify.get("/media/textures/:hash/sprites/bulk", async (request, response) => {
     const texture = fastify.cache.textures.get(request.params.hash);
     if (!texture) return response.code(404).send(codes[404]);
     if (!request.query.sprites) return response.code(400).send(codes[400]);

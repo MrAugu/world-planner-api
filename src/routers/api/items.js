@@ -6,13 +6,16 @@ const routes = async (fastify) => {
     const page_number = parseQueryInteger(request, "page_number", 1);
     const page_size = parseQueryInteger(request, "page_size", 5);
 
-    if (page_size < 1 || page_size > 100) return response.code(400).send(codes[400]);
+    if (page_size < 1 || page_size > 200) return response.code(400).send(codes[400]);
     if (page_number > (totalCount / page_size) + 1) return response.code(400).send(codes[400]);
 
     const items = paginate(Array.from(fastify.cache.items.values()), page_size, page_number);
 
     return response.code(200).send({
       total_count: totalCount,
+      page: page_number,
+      page_size: page_size,
+      max_page_size: 200,
       returned: items.length,
       items: items.map(item => ({
         id: item.id,
@@ -21,6 +24,7 @@ const routes = async (fastify) => {
         action_type: item.action_type,
         texture_x: item.texture_x,
         texture_y: item.texture_y,
+        main_sprite: item.texture.slices[item.texture_x][item.texture_y].toString("base64"),
         collision_type: item.collision_type,
         rarity: item.rarity,
         max_amount: item.max_amount,
@@ -31,3 +35,26 @@ const routes = async (fastify) => {
 };
 
 module.exports = routes;
+
+// [ true, true, true, true ]
+//  Up   Right  Down  Left
+
+function getCollisions (item) {
+  const collisions = {};
+  if ([1, 4].includes(item.collision_type) && item.spread_type === 2) {
+    collisions[[true, true, true, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+    collisions[[false, true, true, true]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
+    collisions[[true, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y + 1 };
+    collisions[[true, true, false, true]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y };
+    collisions[[true, false, true, false]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y + 1 };
+    collisions[[false, false, true, false]] = { textire_x: item.texture_x + 2, texture_y: item.texture_y + 1 };
+    collisions[[true, true, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y };
+    collisions[[false, false, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 1 };
+    collisions[[true, false, false, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 2 };
+    collisions[[true, false, true, true]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y };
+    collisions[[false, false, false, false]] = { texture_x: item.texture_x + 5, texture_y: item.texture_y };
+    collisions[[false, true, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 1 };
+    collisions[[]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 1 };
+    collisions[[]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 1 };
+  }
+}
