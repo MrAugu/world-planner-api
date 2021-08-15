@@ -2,46 +2,50 @@ const { paginate, parseQueryInteger, codes } = require("../../../lib/index");
 
 const routes = async (fastify) => {
   fastify.get("/items", async (request, response) => {
+    const max_page_size = 400;
+    const min_page_size = 1;
+  
     const totalCount = fastify.cache.items.size;
     const page_number = parseQueryInteger(request, "page_number", 1);
     const page_size = parseQueryInteger(request, "page_size", 5);
 
-    if (page_size < 1 || page_size > 200) return response.code(400).send(codes[400]);
+    if (page_size < min_page_size || page_size > max_page_size) return response.code(400).send(codes[400]);
     if (page_number > (totalCount / page_size) + 1) return response.code(400).send(codes[400]);
-
     const items = paginate(Array.from(fastify.cache.items.values()), page_size, page_number);
 
     return response.code(200).send({
       total_count: totalCount,
-      page: page_number,
+      page_number: page_number,
       page_size: page_size,
-      max_page_size: 200,
-      returned: items.length,
+      maximum_size: max_page_size,
+      minimum_size: min_page_size,
+      amount_returned: items.length,
       items: items.map(item => ({
         id: item.id,
         name: item.name,
-        texture: item.texture.hash,
-        action_type: item.action_type,
+        texture_hash: item.texture.hash,
         texture_x: item.texture_x,
         texture_y: item.texture_y,
         sprite: item.texture.slices[item.texture_x][item.texture_y].toString("base64"),
-        sprites_array: getSpread(item).map(spreads => {
-          const computedSpreads = {};
-          for (const key of Object.keys(spreads)) {
-            computedSpreads[key] = Object.assign(spreads[key], { data: item.texture.slices[spreads[key].texture_x][spreads[key].texture_y].toString("base64") });
-          }
-          return computedSpreads;
-        }),
-        collision_type: item.collision_type,
+        sprites_map: getItemSpriteArray(item),
         rarity: item.rarity,
-        max_amount: item.max_amount,
-        break_hits: item.break_hits
+        maximum_amount: item.max_amount,
+        hardness: item.break_hits
       }))
     }); 
   });
 };
 
 module.exports = routes;
+
+function getItemSpriteArray (item) {
+  const spreads = getSpread(item);
+  for (const spread of Object.keys(spreads)) {
+    spreads[spread] = Object.assign(spreads[spread], { data: item.texture.slices[spreads[spread].texture_x][spreads[spread].texture_y].toString("base64") });
+  }
+  return spreads;
+}
+
 
 // [ true, true, true, true ]
 //  Up   Right  Down  Left
