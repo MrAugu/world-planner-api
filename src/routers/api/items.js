@@ -24,7 +24,14 @@ const routes = async (fastify) => {
         action_type: item.action_type,
         texture_x: item.texture_x,
         texture_y: item.texture_y,
-        main_sprite: item.texture.slices[item.texture_x][item.texture_y].toString("base64"),
+        sprite: item.texture.slices[item.texture_x][item.texture_y].toString("base64"),
+        sprites_array: getSpread(item).map(spreads => {
+          const computedSpreads = {};
+          for (const key of Object.keys(spreads)) {
+            computedSpreads[key] = Object.assign(spreads[key], { data: item.texture.slices[spreads[key].texture_x][spreads[key].texture_y].toString("base64") });
+          }
+          return computedSpreads;
+        }),
         collision_type: item.collision_type,
         rarity: item.rarity,
         max_amount: item.max_amount,
