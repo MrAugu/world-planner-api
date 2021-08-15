@@ -1,4 +1,4 @@
-const { parseQueryInteger, codes } = require("../../../lib/index");
+const { parseQueryInteger, codes, getItemIdentifier, getItemSprite } = require("../../../lib/index");
 
 const routes = async (fastify) => {
   fastify.get("/media/textures/:hash", async (request, response) => {
@@ -9,7 +9,7 @@ const routes = async (fastify) => {
     response.code(200).send(texture.contents);
   });
 
-  fastify.get("/media/textures/:hash/sprites", async (request, response) => {
+  fastify.get("/media/textures/:hash/slice", async (request, response) => {
     const texture = fastify.cache.textures.get(request.params.hash);
     if (!texture) return response.code(404).send(codes[404]);
     
@@ -35,7 +35,7 @@ const routes = async (fastify) => {
     }
   });
 
-  fastify.get("/media/textures/:hash/sprites/bulk", async (request, response) => {
+  fastify.get("/media/textures/:hash/slices/bulk", async (request, response) => {
     const texture = fastify.cache.textures.get(request.params.hash);
     if (!texture) return response.code(404).send(codes[404]);
     if (!request.query.sprites) return response.code(400).send(codes[400]);
@@ -63,6 +63,16 @@ const routes = async (fastify) => {
       message: "Success",
       data: sprites
     });
+  });
+
+  fastify.get("/media/sprites", async (request, response) => {
+    const query = getItemIdentifier(fastify.cache.items, request);
+    if (!query) return response.code(404).send(codes[404]);
+    const sprite = getItemSprite(query.texture, query);
+    if (!sprite) return response.code(404).send(codes[404]);
+    response.header("Content-Disposition", `inline;filename="${query.texture.name}"`);
+    response.header("Content-Type", "image/png");
+    response.code(200).send(sprite);
   });
 };
 
