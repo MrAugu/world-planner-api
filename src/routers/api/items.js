@@ -1,5 +1,5 @@
 const { paginate, parseQueryInteger, codes, getItemSpriteArray, getItemSprite } = require("../../../lib/index");
-const max_page_size = 200;
+const max_page_size = 150;
 const min_page_size = 1;
 
 const routes = async (fastify) => {
@@ -16,20 +16,26 @@ const routes = async (fastify) => {
       total_count: totalCount,
       maximum_size: max_page_size,
       amount_returned: items.length,
-      items: items.map(item => ({
-        id: item.id,
-        name: item.name,
-        texture_hash: item.texture.hash,
-        texture_x: item.texture_x,
-        texture_y: item.texture_y,
-        sprite: item.texture.slices[item.texture_x][item.texture_y].toString("base64"),
-        sprites_map: getItemSpriteArray(item),
-        rarity: item.rarity,
-        maximum_amount: item.max_amount,
-        hardness: item.break_hits,
-        spread_type: item.spread_type,
-        icon: Buffer.from(getItemSprite(item.texture, item)).toString("base64")
-      }))
+      items: items.map(item => {
+        const serializedItem = {
+          id: item.id,
+          name: item.name,
+          texture: item.texture.hash,
+          texture_x: item.texture_x,
+          texture_y: item.texture_y,
+          sprites_map: getItemSpriteArray(item),
+          rarity: item.rarity,
+          maximum_amount: item.maximum_amount,
+          spread_type: item.spread_type
+        };
+        if (item.textures
+          && item.texture.slices
+          && item.texture.slices[item.texture_x]
+          && item.texture.slices[item.texture_x][item.texture_y]) serializedItem.sprite = item.texture.slices[item.texture_x][item.texture_y].toString("base64");
+        const itemSprite = Buffer.from(getItemSprite(item.texture, item)).toString("base64");
+        if (itemSprite !== serializedItem.sprite) serializedItem.sprite = itemSprite;
+        return serializedItem;
+      })
     }); 
   });
 };
