@@ -30,7 +30,8 @@ const routes = async (fastify) => {
         sprites_map: getItemSpriteArray(item),
         rarity: item.rarity,
         maximum_amount: item.max_amount,
-        hardness: item.break_hits
+        hardness: item.break_hits,
+        spread_type: item.spread_type
       }))
     }); 
   });
