@@ -1,4 +1,3 @@
-const { isSymbol } = require("lodash");
 const { paginate, parseQueryInteger, codes } = require("../../../lib/index");
 
 const routes = async (fastify) => {
@@ -40,9 +39,10 @@ module.exports = routes;
 // [ true, true, true, true ]
 //  Up   Right  Down  Left
 
-function getCollisions (item) {
+function getSpread (item) {
   let collisions = {};
-  if ([1, 4].includes(item.collision_type) && item.spread_type === 2) {
+  if (item.spread_type === 2) {
+    // All ways with 47
     collisions[[true, true, true, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
     collisions[[false, true, true, true]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
     collisions[[true, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y + 1 };
@@ -59,7 +59,8 @@ function getCollisions (item) {
     collisions[[false, true, false, false]] = { texture_x: item.texture_x + 5, texture_y: item.texture_y + 3 };
     collisions[[false, false, false, true]] = { texture_x: item.texture_x + 6, texture_y: item.texture_y + 3 };
     collisions[[false, true, false, true]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y + 3 };    
-  } else if ([1, 4].includes(item.collision_type) && item.spread_type === 5) {
+  } else if (item.spread_type === 5) {
+    // All ways, but has only 16
     collisions[[true, true, true, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
     collisions[[false, true, true, true]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
     collisions[[true, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y + 1 };
@@ -76,18 +77,44 @@ function getCollisions (item) {
     collisions[[false, true, false, false]] = { texture_x: item.texture_x + 6, texture_y: item.texture_y + 1 };
     collisions[[false, false, false, true]] = { texture_x: item.texture_x + 5, texture_y: item.texture_y + 1 };
     collisions[[false, true, false, true]] = { texture_x: item.texture_x + 7, texture_y: item.texture_y + 1 };
-  } else if ([1, 4].includes(item.collision_type) && item.spread_type === 1) {
+  } else if (item.spread_type === 1) {
+    // No collisions
     collisions = {};
-  } else if ([1, 4].includes(item.collision_type) && item.spread_type === 4) {
-    collisions[[true, false, false, false]] = { texture_x: item.texture + 1, texture_y: item.texture_y };
-    collisions[[false, true, false, false]] = { texture_x: item.texture + 2, texture_y: item.texture_y };
-    collisions[[false, false, true, false]] = { texture_x: item.texture + 3, texture_y: item.texture_y };
-    collisions[[false, false, false, true]] = { texture_x: item.texture, texture_y: item.texture_y };
-    collisions[[false, false, false, false]] = { texture_x: item.texture + 4, texture_y: item.texture_y };
-  } else if ([1, 4].includes(item.collision_type) && item.spread_type === 3) {
+  } else if (item.spread_type === 4) {
+    // Attaches on a single side bassed if theres a block in that or none
+    // direction, can be - in either of - in the order of priority: down, up, left, right or none
+    collisions[[true, false, false, false]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
+    collisions[[false, true, false, false]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y };
+    collisions[[false, false, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y };
+    collisions[[false, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+    collisions[[false, false, false, false]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y };
+  } else if (item.spread_type === 3) {
+    // Collisions Leftways/Rightways
     collisions[[false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
     collisions[[true, true]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
     collisions[[true, false]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y };
     collisions[[false, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y };
+  } else if (item.spread_type === 6) {
+    // ?? No Collisions
+    collisions = {};
+  } else if (item.spread_type === 7) {
+    // Collisions Upways/Downways
+    collisions[[true, false]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+    collisions[[true, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+    collisions[[false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+    collisions[[false, false]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+  } else if (item.spread_type === 9) {
+    // Attaches on a single side bassed if theres a block
+    // direction, can be - in either of - in the order of priority: down, up, left, right, default 0
+    collisions[[true, false, false, false]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
+    collisions[[false, true, false, false]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y };
+    collisions[[false, false, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y };
+    collisions[[false, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+  } else if (item.spread_type === 10) {
+    // ?? No collisions
+  } else {
+    collisions = {};
   }
+
+  return collisions;
 }
