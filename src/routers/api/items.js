@@ -47,7 +47,7 @@ function getCollisions (item) {
     collisions[[true, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y + 1 };
     collisions[[true, true, false, true]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y };
     collisions[[true, false, true, false]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y + 1 };
-    collisions[[false, false, true, false]] = { textire_x: item.texture_x + 2, texture_y: item.texture_y + 1 };
+    collisions[[false, false, true, false]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y + 1 };
     collisions[[true, true, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y };
     collisions[[true, false, false, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 1 };
     collisions[[true, false, true, true]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y };
@@ -58,5 +58,22 @@ function getCollisions (item) {
     collisions[[false, true, false, false]] = { texture_x: item.texture_x + 5, texture_y: item.texture_y + 3 };
     collisions[[false, false, false, true]] = { texture_x: item.texture_x + 6, texture_y: item.texture_y + 3 };
     collisions[[false, true, false, true]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y + 3 };    
+  } else if ([1, 4].includes(item.collision_type) && item.spread_type === 5) {
+    collisions[[true, true, true, true]] = { texture_x: item.texture_x, texture_y: item.texture_y };
+    collisions[[false, true, true, true]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y };
+    collisions[[true, false, false, true]] = { texture_x: item.texture_x, texture_y: item.texture_y + 1 };
+    collisions[[true, true, false, true]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y };
+    collisions[[true, false, true, false]] = { texture_x: item.texture_x + 1, texture_y: item.texture_y + 1 };
+    collisions[[false, false, true, false]] = { texture_x: item.texture_x + 2, texture_y: item.texture_y + 1 };
+    collisions[[true, true, true, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y };
+    collisions[[true, false, false, false]] = { texture_x: item.texture_x + 3, texture_y: item.texture_y + 1 };
+    collisions[[true, false, true, true]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y };
+    collisions[[false, false, false, false]] = { texture_x: item.texture_x + 4, texture_y: item.texture_y + 1 };
+    collisions[[false, true, true, false]] = { texture_x: item.texture_x + 5, texture_y: item.texture_y };
+    collisions[[false, false, true, true]] = { texture_x: item.texture_x + 6, texture_y: item.texture_y };
+    collisions[[true, true, false, false]] = { texture_x: item.texture_x + 7, texture_y: item.texture_y };
+    collisions[[false, true, false, false]] = { texture_x: item.texture_x + 6, texture_y: item.texture_y + 1 };
+    collisions[[false, false, false, true]] = { texture_x: item.texture_x + 5, texture_y: item.texture_y + 1 };
+    collisions[[false, true, false, true]] = { texture_x: item.texture_x + 7, texture_y: item.texture_y + 1 };
   }
 }
