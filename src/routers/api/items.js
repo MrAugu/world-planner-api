@@ -28,12 +28,9 @@ const routes = async (fastify) => {
           maximum_amount: item.maximum_amount,
           spread_type: item.spread_type
         };
-        if (item.textures
-          && item.texture.slices
-          && item.texture.slices[item.texture_x]
-          && item.texture.slices[item.texture_x][item.texture_y]) serializedItem.sprite = item.texture.slices[item.texture_x][item.texture_y].toString("base64");
         const itemSprite = Buffer.from(getItemSprite(item.texture, item)).toString("base64");
-        if (itemSprite !== serializedItem.sprite) serializedItem.sprite = itemSprite;
+        if (itemSprite) serializedItem.sprite = itemSprite;
+        else fastify.cache.textures.find(texture => texture.name === "tiles_page1.png").slices[1][16].toString("base64");
         return serializedItem;
       })
     }); 
