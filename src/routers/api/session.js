@@ -4,7 +4,6 @@ const snowflake = new snowflakeId({
   offset: (2021 - 1970) * 31536000 * 1000 
 });
 const jwt = require("jsonwebtoken");
-const { codes } = require("../../../lib/index");
 
 const routes = async (fastify) => {
   fastify.put("/sessions/new", async (request, response) => {
@@ -18,8 +17,7 @@ const routes = async (fastify) => {
     // const str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0".split("").map(x => x.charCodeAt(0)).reverse().map(c 
     // => c + 55).map(z => String.fromCharCode(z)).map(x => Buffer.from(x).toString("hex")).join(":");
 
-    if (identifier && typeof identifier === "string" && stamp && !isNaN(parseInt(stamp))) {
-      if (Date.now() - stamp > 120000) return response.code(400).send(codes[400]);
+    if (identifier && typeof identifier === "string" && stamp && !isNaN(parseInt(stamp)) && Date.now() - parseInt(stamp) < 2000) {
       const offset = getDateOffset(parseInt(stamp));
       identifier = identifier
         .split(":")
