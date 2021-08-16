@@ -30,7 +30,7 @@ const routes = async (fastify) => {
 
     const requestId = snowflake.generate();
 
-    fastify.db.execute("INSERT INTO `world_planner`.`requests` (id, token_id, headers, date, ip, url, query_string) VALUES (?, ?, ?, ?, ?, ?)", [
+    fastify.db.execute("INSERT INTO `world_planner`.`requests` (id, token_id, headers, date, ip, url, query_string) VALUES (?, ?, ?, ?, ?, ?, ?)", [
       BigInt(requestId),
       auth.id,
       JSON.stringify(request.headers),
@@ -40,7 +40,7 @@ const routes = async (fastify) => {
     ]);
 
     if (auth.isTrustworthy) {
-      const webhookRequest = new Request(process.env.SECURITY_WEBHOOK)
+      const webhookRequest = new Request(process.env.LOG_WEBHOOK)
         .method("post")
         .body({
           username: "World Planner Logger",
