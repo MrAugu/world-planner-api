@@ -141,8 +141,8 @@ const routes = async (fastify) => {
 
     response.header("Content-Type", "application/json");
     const totalCount = fastify.cache.weathers.size; 
-    const page_number = parseQueryInteger(request, "page_number", 1);
-    const page_size = parseQueryInteger(request, "page_size", 5);
+    const page_number = parseQueryInteger(request, "page", 1);
+    const page_size = parseQueryInteger(request, "page_size", 2);
 
     if (page_size < min_page_size || page_size > max_page_size) return response.code(400).send(codes[400]);
     if (page_number > (totalCount / page_size) + 1) return response.code(400).send(codes[400]);
@@ -155,7 +155,7 @@ const routes = async (fastify) => {
       weathers: weathers.map(weather => ({
         name: weather.name,
         hash: weather.hash,
-        data: weather.contents.toString("buffer64")
+        data: weather.contents.toString("base64")
       }))
     }); 
   });
