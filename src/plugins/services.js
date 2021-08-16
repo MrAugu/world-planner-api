@@ -1,6 +1,6 @@
 const fp = require("fastify-plugin");
 const mysql = require("mysql2/promise");
-const { makeTextureCache, makeItemCache } = require("../../lib/index");
+const { makeTextureCache, makeItemCache, makeWeatherCache } = require("../../lib/index");
 const Collection = require("@modcord/collection");
 
 async function plugin (fastify) {
@@ -13,10 +13,12 @@ async function plugin (fastify) {
   fastify.decorate("db", connection);
   fastify.decorate("cache", {
     textures: new Collection(),
-    items: new Collection()
+    items: new Collection(),
+    weathers: new Collection()
   });
   await makeTextureCache(fastify);
   await makeItemCache(fastify);
+  await makeWeatherCache(fastify);
 }
 
 module.exports = fp(plugin, {

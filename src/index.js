@@ -31,7 +31,7 @@ require("dotenv").config();
   process.on("unhandledRejection", console.error);
 
   for (const texture of Array.from(fastify.cache.textures.values())) {
-    process.stdout.write(`[Cache]: Slicing ${texture.hash} (${(texture.width / 32) * (texture.height / 32)} blocks)..`);
+    process.stdout.write(`[Cache]: Slicing ${texture.name} (${(texture.width / 32) * (texture.height / 32)} blocks)..`);
     await texture.createSlices();
     process.stdout.write(" OK\n");
   }

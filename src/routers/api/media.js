@@ -1,4 +1,13 @@
-const { parseQueryInteger, codes, getItemIdentifier, getItemSprite } = require("../../../lib/index");
+const { parseQueryInteger, codes, getItemIdentifier, getItemSprite, paginate, getStringifedObject } = require("../../../lib/index");
+const max_page_size = 10;
+const min_page_size = 1;
+const jwt = require("jsonwebtoken");
+const SnowflakeId = require("snowflake-id").default;
+const snowflake = new SnowflakeId({
+  mid: 2,
+  offset: (2021 - 1970) * 31536000 * 1000 
+});
+const { Request } = require("@modcord/http-client");
 
 const routes = async (fastify) => {
   fastify.get("/media/textures/:hash", async (request, response) => {
@@ -73,6 +82,82 @@ const routes = async (fastify) => {
     response.header("Content-Disposition", `inline;filename="${query.texture.name}"`);
     response.header("Content-Type", "image/png");
     response.code(200).send(sprite);
+  });
+
+  fastify.get("/media/weathers/:hash", async (request, response) => {
+    const weather = fastify.cache.weathers.get(request.params.hash);
+    if (!weather) return response.code(404).send(codes[404]);
+    response.header("Content-Disposition", `inline;filename="${weather.name}"`);
+    response.header("Content-Type", "image/png");
+    response.code(200).send(weather.contents);
+  });
+
+  fastify.get("/media/weathers", async (request, response) => {
+    let auth;
+    if (!request.headers.authorization) return response.code(403).send(codes[403]);
+    else {
+      const [keyword, authorization] = request.headers.authorization.split(" ");
+      if (!keyword || keyword !== "Bearer") return response.code(403).send(codes[403]);
+      if (!authorization) return response.code(403).send(codes[403]);
+      try {
+        const payload = jwt.verify(authorization, process.env.SECRET);
+        if (!payload.id) return response.code(403).send(codes[403]);
+        const [[token]] = await fastify.db.execute("SELECT * FROM `world_planner`.`tokens` WHERE (id = ?)", [ BigInt(payload.id) ]);
+        if (!token) return response.code(403).send(codes[403]);
+        auth = token;
+      } catch (err) {
+        return response.code(403).send(codes[403]);
+      }
+    }
+
+    const requestId = snowflake.generate();
+    fastify.db.execute("INSERT INTO `world_planner`.`requests` (id, token_id, headers, date, ip, url, query_string) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+      BigInt(requestId),
+      auth.id,
+      JSON.stringify(request.headers),
+      new Date(),
+      request.headers.http_cf_connecting_ip || request.ip || null,
+      request.url,
+      JSON.stringify(request.query)
+    ]);
+
+    if (auth.isTrustworthy) {
+      const webhookRequest = new Request(process.env.LOG_WEBHOOK)
+        .method("post")
+        .body({
+          username: "World Planner Logger",
+          content: `OK: Trustworthy token \`[${auth.id}]\` made the request with id \`[${requestId}]\` and query string:\n\`\`\`${getStringifedObject(request.query)}\`\`\``
+        });
+      webhookRequest.send();
+    } else {
+      const webhookRequest = new Request(process.env.SECURITY_WEBHOOK)
+        .method("post")
+        .body({
+          username: "World Planner Logger",
+          content: `NOT OK!: **__Un-trustworthy token__** \`[${auth.id}]\` made the request with id \`[${requestId}]\` and query string:\n\`\`\`${getStringifedObject(request.query)}\`\`\`\nCC: <@367302593753645057> & <@235660286718246912>`
+        });
+      webhookRequest.send();
+    }
+
+    response.header("Content-Type", "application/json");
+    const totalCount = fastify.cache.weathers.size; 
+    const page_number = parseQueryInteger(request, "page_number", 1);
+    const page_size = parseQueryInteger(request, "page_size", 5);
+
+    if (page_size < min_page_size || page_size > max_page_size) return response.code(400).send(codes[400]);
+    if (page_number > (totalCount / page_size) + 1) return response.code(400).send(codes[400]);
+    const weathers = paginate(Array.from(fastify.cache.weathers.values()), page_size, page_number);
+
+    return response.code(200).send({
+      total_count: totalCount,
+      maximum_size: max_page_size,
+      amount_returned: weathers.length,
+      weathers: weathers.map(weather => ({
+        name: weather.name,
+        hash: weather.hash,
+        data: weather.contents.toString("buffer64")
+      }))
+    }); 
   });
 };
 
