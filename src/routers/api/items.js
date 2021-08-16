@@ -36,6 +36,7 @@ const routes = async (fastify) => {
       JSON.stringify(request.headers),
       new Date(),
       request.headers.http_cf_connecting_ip || request.ip || null,
+      request.url,
       JSON.stringify(request.query)
     ]);
 

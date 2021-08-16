@@ -9,7 +9,7 @@ const routes = async (fastify) => {
     response.code(200).send(texture.contents);
   });
 
-  fastify.get("/media/textures/:hash/slice", async (request, response) => {
+  fastify.get("/media/textures/:hash/slices", async (request, response) => {
     const texture = fastify.cache.textures.get(request.params.hash);
     if (!texture) return response.code(404).send(codes[404]);
     
