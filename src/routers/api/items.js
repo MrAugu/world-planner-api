@@ -4,6 +4,7 @@ const min_page_size = 1;
 
 const routes = async (fastify) => {
   fastify.get("/items", async (request, response) => {
+    response.header("Content-Type", "application/json");
     const totalCount = fastify.cache.items.size; 
     const page_number = parseQueryInteger(request, "index", 1);
     const page_size = parseQueryInteger(request, "size", 5);

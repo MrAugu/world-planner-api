@@ -18,6 +18,7 @@
   "homepage": "https://github.com/MrAugu/world-planner-api#readme",
   "dependencies": {
     "@modcord/collection": "^1.0.2",
+    "@modcord/http-client": "^1.0.2",
     "buffer-image-size": "^0.6.4",
     "dotenv": "^10.0.0",
     "fastify": "^3.20.2",
@@ -29,6 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mysql2": "^2.3.0",
-    "node-canvas": "^2.7.0"
+    "node-canvas": "^2.7.0",
+    "snowflake-id": "^1.1.0"
   }
 }
