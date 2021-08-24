@@ -53,7 +53,7 @@ const routes = async (fastify) => {
         .method("post")
         .body({
           username: "World Planner Logger",
-          content: `NOT OK!: **__Un-trustworthy token__** \`[${auth.id}]\` made the request with id \`[${requestId}]\` and query string:\n\`\`\`${getStringifedObject(request.query)}\`\`\`\nCC: <@367302593753645057> & <@235660286718246912>`
+          content: `NOT OK!: **__Un-trustworthy token__** \`[${auth.id}]\` made the request with id \`[${requestId}]\` and query string:\n\`\`\`${getStringifedObject(request.query)}\`\`\``
         });
       webhookRequest.send();
     }
@@ -80,12 +80,12 @@ const routes = async (fastify) => {
           texture_y: item.texture_y,
           sprites_map: getItemSpriteArray(item),
           rarity: item.rarity,
-          maximum_amount: item.maximum_amount,
+          maximum_amount: item.max_amount,
           spread_type: item.spread_type
         };
         const itemSprite = Buffer.from(getItemSprite(item.texture, item)).toString("base64");
         if (itemSprite) serializedItem.sprite = itemSprite;
-        else fastify.cache.textures.find(texture => texture.name === "tiles_page1.png").slices[1][16].toString("base64");
+        else serializedItem.sprite = fastify.cache.textures.find(texture => texture.name === "tiles_page1.png").slices[1][16].toString("base64");
         return serializedItem;
       })
     }); 

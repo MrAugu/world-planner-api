@@ -8,13 +8,13 @@ async function plugin (fastify, options) { // eslint-disable-line no-unused-vars
     global: true,
     ban: 40,
     max: () => defaultLimitIndexPerMinute * secondsInAMinute,
-    errorResponseBuilder: (request) => {
+    errorResponseBuilder: (request, response) => {
       const payload = {
         "code": 429,
         "error": "Too many requests",
         "message": "You are being rate limited."
       };
-      return request.code(429).send(payload);
+      return response.code(429).send(payload);
     }
   });
 }

@@ -1,6 +1,6 @@
 const AutoLoad = require("fastify-autoload");
 const fastify = require("fastify")({
-  logger: false
+  pluginTimeout: 100000
 });
 const { join } = require("path");
 require("dotenv").config();
