@@ -1,5 +1,5 @@
 const { parseQueryInteger, codes, getItemIdentifier, getItemSprite, paginate, getStringifedObject } = require("../../../lib/index");
-const max_page_size = 10;
+const max_page_size = 3;
 const min_page_size = 1;
 const jwt = require("jsonwebtoken");
 const SnowflakeId = require("snowflake-id").default;
